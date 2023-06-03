@@ -1,28 +1,43 @@
-name: Rust Arm64 Build
+name: Build and Arm64-test
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
 
 jobs:
   build:
-    name: Build for Arm64
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-    - name: Set up Rust
+    - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+        override: true
+        components: rustfmt, clippy
 
-    - name: Install required dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+    - name: Install NDK
+      uses: nttld/actions-android-ndk-rs@v1
+      with:
+        ndk: 22.1.7171670
+        target: aarch64-linux-android
 
-    - name: Build for Arm64
-      run: cargo build --release --target aarch64-linux-android
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --target=aarch64-linux-android
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-binary
+        path: target/aarch64-linux-android/release/my-binary
