@@ -1,0 +1,28 @@
+name: Rust Arm64 Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build for Arm64
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - name: Install required dependencies
+      run: |
+        apt-get update
+        apt-get install -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+
+    - name: Build for Arm64
+      run: cargo build --release --target aarch64-linux-android
