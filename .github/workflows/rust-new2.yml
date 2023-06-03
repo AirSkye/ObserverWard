@@ -63,5 +63,5 @@ jobs:
         with:
           name: binaries-linux-${{ matrix.job.name }}
           path: |
-            target/${{ matrix.job.target }}/release/ob_test
+            target/${{ matrix.job.target }}/release/observer_ward
           if-no-files-found: error
