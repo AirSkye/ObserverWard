@@ -35,11 +35,21 @@ jobs:
       run: echo "AR_aarch64_linux_android=${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar" >> $GITHUB_ENV
 
     - name: Install bzip2 and zstd
-      run: sudo apt-get install -y libbz2-dev libzstd-dev libunwind-dev
+      run: sudo apt-get install -y libbz2-dev libzstd-dev
 
     - name: Setup Rust target
       run: rustup target add aarch64-linux-android
-
+      
+    - name: Build libunwind
+      run: |
+        wget http://download.savannah.nongnu.org/releases/libunwind/libunwind-1.5.0.tar.gz
+        tar xvf libunwind-1.5.0.tar.gz
+        cd libunwind-1.5.0
+        ./configure --host=aarch64-linux-android --prefix=${NDK_HOME}/sysroot/usr
+        make
+        make install
+        echo "LIBRARY_PATH=${NDK_HOME}/sysroot/usr/lib" >> $GITHUB_ENV
+        
     - name: Build
       run: |
         export CC=${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
